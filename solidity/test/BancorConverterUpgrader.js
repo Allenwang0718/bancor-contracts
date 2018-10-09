@@ -1,14 +1,14 @@
 /* global artifacts, contract, before, it, assert */
 /* eslint-disable prefer-reflect */
 
-const fs = require('fs');
+// const fs = require('fs');
 const path = require('path');
 const BancorNetwork = artifacts.require('BancorNetwork.sol');
 const ContractIds = artifacts.require('ContractIds.sol');
 const BancorConverter = artifacts.require('BancorConverter.sol');
 const SmartToken = artifacts.require('SmartToken.sol');
 const BancorFormula = artifacts.require('BancorFormula.sol');
-const ContractRegistry = artifacts.require('SettingsRegistry.sol');
+const SettingsRegistry = artifacts.require('SettingsRegistry.sol');
 const ContractFeatures = artifacts.require('ContractFeatures.sol');
 const TestERC20Token = artifacts.require('TestERC20Token.sol');
 const Whitelist = artifacts.require('Whitelist.sol');
@@ -21,12 +21,12 @@ let contractRegistry;
 let contractFeatures;
 let converterUpgrader;
 
-const contractsPath = path.resolve(__dirname, '../contracts/build');
-let abi;
-abi = fs.readFileSync(path.resolve(contractsPath, 'BancorConverter.abi'), 'utf-8');
-let converterAbi = JSON.parse(abi);
-abi = fs.readFileSync(path.resolve(contractsPath, 'SmartToken.abi'), 'utf-8');
-let SmartTokenAbi = JSON.parse(abi);
+// const contractsPath = path.resolve(__dirname, '../contracts/build');
+// let abi;
+// abi = fs.readFileSync(path.resolve(contractsPath, 'BancorConverter.abi'), 'utf-8');
+// let converterAbi = JSON.parse(abi);
+// abi = fs.readFileSync(path.resolve(contractsPath, 'SmartToken.abi'), 'utf-8');
+// let SmartTokenAbi = JSON.parse(abi);
 
 async function initConverter(accounts, activate, maxConversionFee = 30000) {
     token = await SmartToken.new('Token1', 'TKN1', 18);
@@ -60,7 +60,7 @@ async function initConverter(accounts, activate, maxConversionFee = 30000) {
 
 contract('BancorConverterUpgrader', accounts => {
     before(async () => {
-        contractRegistry = await ContractRegistry.new();
+        contractRegistry = await SettingsRegistry.new();
         let contractIds = await ContractIds.new();
 
         contractFeatures = await ContractFeatures.new();
@@ -97,8 +97,8 @@ contract('BancorConverterUpgrader', accounts => {
         let initialOwner = await converter.owner.call();
         let upgradeRes = await converterUpgrader.upgrade(converter.address, web3.fromUtf8("0.7"));
         let newConverterAddress = upgradeRes.logs[4].args._newConverter;
-        let contract = await web3.eth.contract(converterAbi);
-        let newConverter = await contract.at(newConverterAddress);
+        // let contract = await web3.eth.contract(converterAbi);
+        let newConverter = await BancorConverter.at(newConverterAddress);
         let newOwner = await newConverter.newOwner.call();
         assert.equal(initialOwner, newOwner);
     });
@@ -106,8 +106,8 @@ contract('BancorConverterUpgrader', accounts => {
     it('verifies that the token ownership held by current converter transfered to the new converter', async () => {
         let converter = await initConverter(accounts, true);
         let tokenAddress = await converter.token.call();
-        let tokenContract = web3.eth.contract(SmartTokenAbi);
-        let token1 = tokenContract.at(tokenAddress);
+        // let tokenContract = web3.eth.contract(SmartTokenAbi);
+        let token1 = SmartToken.at(tokenAddress);
         let initialTokenOwner = await token1.owner.call();
         assert.equal(initialTokenOwner, converter.address);
         await converter.transferOwnership(converterUpgrader.address);
@@ -123,8 +123,8 @@ contract('BancorConverterUpgrader', accounts => {
         let initialManager = await converter.manager.call();
         let upgradeRes = await converterUpgrader.upgrade(converter.address, web3.fromUtf8("0.7"));
         let newConverterAddress = upgradeRes.logs[4].args._newConverter;
-        let contract = await web3.eth.contract(converterAbi);
-        let newConverter = await contract.at(newConverterAddress);
+        // let contract = await web3.eth.contract(converterAbi);
+        let newConverter = await BancorConverter.at(newConverterAddress);
         let newManager = await newConverter.newManager.call();
         assert.equal(initialManager, newManager);
     });
@@ -135,8 +135,8 @@ contract('BancorConverterUpgrader', accounts => {
         await converter.transferOwnership(converterUpgrader.address);
         let upgradeRes = await converterUpgrader.upgrade(converter.address, web3.fromUtf8("0.7"));
         let newConverterAddress = upgradeRes.logs[4].args._newConverter;
-        let contract = await web3.eth.contract(converterAbi);
-        let newConverter = await contract.at(newConverterAddress);
+        // let contract = await web3.eth.contract(converterAbi);
+        let newConverter = await BancorConverter.at(newConverterAddress);
         let newLength = await newConverter.getQuickBuyPathLength.call();
         assert.equal(initialLength.toFixed(), newLength.toFixed());
     });
@@ -163,8 +163,8 @@ contract('BancorConverterUpgrader', accounts => {
         await converter.transferOwnership(converterUpgrader.address);
         let upgradeRes = await converterUpgrader.upgrade(converter.address, web3.fromUtf8("0.7"));
         let newConverterAddress = upgradeRes.logs[4].args._newConverter;
-        let contract = await web3.eth.contract(converterAbi);
-        let newConverter = await contract.at(newConverterAddress);
+        // let contract = await web3.eth.contract(converterAbi);
+        let newConverter = await BancorConverter.at(newConverterAddress);
         let conversionWhitelist = await newConverter.conversionWhitelist.call();
         assert.equal(whitelist.address, conversionWhitelist);
     });
@@ -176,8 +176,8 @@ contract('BancorConverterUpgrader', accounts => {
         await converter.transferOwnership(converterUpgrader.address);
         let upgradeRes = await converterUpgrader.upgrade(converter.address, web3.fromUtf8("0.7"));
         let newConverterAddress = upgradeRes.logs[4].args._newConverter;
-        let contract = web3.eth.contract(converterAbi);
-        let newConverter = contract.at(newConverterAddress);
+        // let contract = web3.eth.contract(converterAbi);
+        let newConverter = BancorConverter.at(newConverterAddress);
         for (let i = 0; i < initialPathLength; i++) {
             let initialToken = await converter.quickBuyPath.call(i);
             let currentToken = await newConverter.quickBuyPath.call(i);
@@ -211,8 +211,8 @@ contract('BancorConverterUpgrader', accounts => {
         await converter.transferOwnership(converterUpgrader.address);
         let upgradeRes = await converterUpgrader.upgrade(converter.address, web3.fromUtf8("0.7"));
         let newConverterAddress = upgradeRes.logs[4].args._newConverter;
-        let contract = web3.eth.contract(converterAbi);
-        let newConverter = contract.at(newConverterAddress);
+        // let contract = web3.eth.contract(converterAbi);
+        let newConverter = BancorConverter.at(newConverterAddress);
         let newVal = await newConverter.maxConversionFee.call();
         assert.equal(newVal.toFixed(), "20000");
     });
@@ -223,8 +223,8 @@ contract('BancorConverterUpgrader', accounts => {
         await converter.transferOwnership(converterUpgrader.address);
         let upgradeRes = await converterUpgrader.upgrade(converter.address, web3.fromUtf8("0.7"));
         let newConverterAddress = upgradeRes.logs[4].args._newConverter;
-        let contract = web3.eth.contract(converterAbi);
-        let newConverter = contract.at(newConverterAddress);
+        // let contract = web3.eth.contract(converterAbi);
+        let newConverter = BancorConverter.at(newConverterAddress);
         let currentConversionFee = await newConverter.conversionFee.call();
         assert.equal(initialConversionFee.toFixed(), currentConversionFee.toFixed());
     });
@@ -273,8 +273,8 @@ contract('BancorConverterUpgrader', accounts => {
         await converter.transferOwnership(converterUpgrader.address);
         let upgradeRes = await converterUpgrader.upgrade(converter.address, web3.fromUtf8("0.7"));
         let newConverterAddress = upgradeRes.logs[4].args._newConverter;
-        let contract = web3.eth.contract(converterAbi);
-        let newConverter = contract.at(newConverterAddress);
+        // let contract = web3.eth.contract(converterAbi);
+        let newConverter = BancorConverter.at(newConverterAddress);
         let newConverterConnectorTokenCount = await newConverter.connectorTokenCount.call();
         assert.equal(currentConverterConnectorTokenCount.toFixed(), newConverterConnectorTokenCount.toFixed());
     });
@@ -288,8 +288,8 @@ contract('BancorConverterUpgrader', accounts => {
         await converter.transferOwnership(converterUpgrader.address);
         let upgradeRes = await converterUpgrader.upgrade(converter.address, web3.fromUtf8("0.7"));
         let newConverterAddress = upgradeRes.logs[4].args._newConverter;
-        let contract = web3.eth.contract(converterAbi);
-        let newConverter = contract.at(newConverterAddress);
+        // let contract = web3.eth.contract(converterAbi);
+        let newConverter = BancorConverter.at(newConverterAddress);
         let currentConnectorBalance1 = await newConverter.getConnectorBalance.call(connector1);
         let currentConnectorBalance2 = await newConverter.getConnectorBalance.call(connector2);
         assert.equal(initialConnectorBalance1.toFixed(), currentConnectorBalance1.toFixed());
@@ -334,8 +334,8 @@ contract('BancorConverterUpgrader', accounts => {
         let upgradeRes = await converterUpgrader.upgrade(converter1.address, 7);
         await converter1.acceptOwnership();
         let newConverterAddress = upgradeRes.logs[3].args._newConverter;
-        let contract = web3.eth.contract(converterAbi);
-        let newConverter = contract.at(newConverterAddress);
+        // let contract = web3.eth.contract(converterAbi);
+        let newConverter = BancorConverter.at(newConverterAddress);
         let newConverterConnectorTokenCount = await newConverter.connectorTokenCount.call();
         assert.equal(newConverterConnectorTokenCount.toFixed(), 2);
         let newMaxConversionFee = await newConverter.maxConversionFee.call();

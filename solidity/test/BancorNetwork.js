@@ -8,7 +8,7 @@ const BancorConverter = artifacts.require('BancorConverter.sol');
 const SmartToken = artifacts.require('SmartToken.sol');
 const BancorFormula = artifacts.require('BancorFormula.sol');
 const BancorGasPriceLimit = artifacts.require('BancorGasPriceLimit.sol');
-const ContractRegistry = artifacts.require('SettingsRegistry.sol');
+const SettingsRegistry = artifacts.require('SettingsRegistry.sol');
 const ContractFeatures = artifacts.require('ContractFeatures.sol');
 const EtherToken = artifacts.require('EtherToken.sol');
 const TestERC20Token = artifacts.require('TestERC20Token.sol');
@@ -92,7 +92,7 @@ Token network structure:
 
 contract('BancorNetwork', accounts => {
     before(async () => {
-        contractRegistry = await ContractRegistry.new();
+        contractRegistry = await SettingsRegistry.new();
         contractIds = await ContractIds.new();
 
         let contractFeatures = await ContractFeatures.new();
