@@ -6,7 +6,7 @@ import './converter/interfaces/IBancorConverter.sol';
 import './converter/interfaces/IBancorFormula.sol';
 import './converter/interfaces/IBancorGasPriceLimit.sol';
 import './utility/TokenHolder.sol';
-import "../../node_modules/@evolutionland/common/contracts/interfaces/ISettingsRegistry.sol";
+import "@evolutionland/common/contracts/interfaces/ISettingsRegistry.sol";
 import './utility/interfaces/IContractFeatures.sol';
 import './utility/interfaces/IWhitelist.sol';
 import './token/interfaces/IEtherToken.sol';

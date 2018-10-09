@@ -6,7 +6,7 @@ import '../ContractIds.sol';
 import '../FeatureIds.sol';
 import '../utility/Managed.sol';
 import '../utility/Utils.sol';
-import "../../../node_modules/@evolutionland/common/contracts/interfaces/ISettingsRegistry.sol";
+import "@evolutionland/common/contracts/interfaces/ISettingsRegistry.sol";
 import '../utility/interfaces/IContractFeatures.sol';
 import '../token/SmartTokenController.sol';
 import '../token/interfaces/ISmartToken.sol';

@@ -1,7 +1,7 @@
 pragma solidity ^0.4.23;
 import './BancorConverter.sol';
 import './interfaces/IBancorConverterFactory.sol';
-import "../../../node_modules/@evolutionland/common/contracts/interfaces/ISettingsRegistry.sol";
+import "@evolutionland/common/contracts/interfaces/ISettingsRegistry.sol";
 
 /*
     Bancor Converter Factory

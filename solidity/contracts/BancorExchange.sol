@@ -2,6 +2,7 @@ pragma solidity ^0.4.23;
 
 import "./converter/BancorConverter.sol";
 
+
 contract BancorExchange is Owned {
 
     ISmartToken public smartToken;
@@ -65,11 +66,9 @@ contract BancorExchange is Owned {
     // this is used to buy specific amount of ring with minimum required eth
     function buyRINGInMinRequiedETH(uint _minReturn, address _buyer) payable public returns (uint, uint) {
         require(msg.sender == clockAuction);
-        uint connectorBalance = bancorConverter.getConnectorBalance(quickBuyPath[0]);
-        uint supply = smartToken.totalSupply();
-        (, uint cw, , , ) = bancorConverter.connectors(quickBuyPath[0]);
-        //uint cw = bancorConverter.connectors(quickBuyPath[0]).weight;
-        (uint amountRequired) = bancorConverter.getPurchaseRequire(connectorBalance, supply, cw, _minReturn);
+
+        (uint amountRequired) = bancorConverter.getPurchaseRequire(quickBuyPath[0], _minReturn);
+
         require(msg.value >= amountRequired);
         uint amount = bancorConverter.quickConvert.value(amountRequired)(quickBuyPath, msg.value, _minReturn);
         uint refundEth = msg.value - amountRequired;

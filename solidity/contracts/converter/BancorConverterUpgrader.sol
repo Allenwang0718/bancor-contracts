@@ -2,7 +2,7 @@ pragma solidity ^0.4.23;
 import './interfaces/IBancorConverter.sol';
 import './interfaces/IBancorConverterFactory.sol';
 import '../utility/Owned.sol';
-import "../../../node_modules/@evolutionland/common/contracts/interfaces/ISettingsRegistry.sol";
+import "@evolutionland/common/contracts/interfaces/ISettingsRegistry.sol";
 import '../utility/interfaces/IContractFeatures.sol';
 import '../utility/interfaces/IWhitelist.sol';
 import '../ContractIds.sol';
