@@ -25,8 +25,8 @@ contract IBancorConverterExtended is IBancorConverter, IOwned {
     function transferTokenOwnership(address _newOwner) public;
     function withdrawTokens(IERC20Token _token, address _to, uint256 _amount) public;
     function acceptTokenOwnership() public;
-    function transferManagement(address _newManager) public;
-    function acceptManagement() public;
+    // function transferManagement(address _newManager) public;
+    // function acceptManagement() public;
     function setConversionFee(uint32 _conversionFee) public;
     function setQuickBuyPath(IERC20Token[] _path) public;
     function addConnector(IERC20Token _token, uint32 _weight, bool _enableVirtualBalance) public;
@@ -107,7 +107,7 @@ contract BancorConverterUpgrader is Owned, ContractIds, FeatureIds {
 
         _oldConverter.transferOwnership(msg.sender);
         newConverter.transferOwnership(msg.sender);
-        newConverter.transferManagement(msg.sender);
+        // newConverter.transferManagement(msg.sender);
 
         emit ConverterUpgrade(address(_oldConverter), address(newConverter));
     }
@@ -150,7 +150,7 @@ contract BancorConverterUpgrader is Owned, ContractIds, FeatureIds {
 
         IBancorConverterExtended converter = IBancorConverterExtended(converterAdderess);
         converter.acceptOwnership();
-        converter.acceptManagement();
+        // converter.acceptManagement();
 
         // get the contract features address from the registry
         IContractFeatures features = IContractFeatures(registry.addressOf(ContractIds.CONTRACT_FEATURES));

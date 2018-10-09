@@ -97,19 +97,19 @@ contract('BancorNetwork', accounts => {
 
         let contractFeatures = await ContractFeatures.new();
         let contractFeaturesId = await contractIds.CONTRACT_FEATURES.call();
-        await contractRegistry.registerAddress(contractFeaturesId, contractFeatures.address);
+        await contractRegistry.setAddressProperty(contractFeaturesId, contractFeatures.address);
 
         let gasPriceLimit = await BancorGasPriceLimit.new(defaultGasPriceLimit);
         let gasPriceLimitId = await contractIds.BANCOR_GAS_PRICE_LIMIT.call();
-        await contractRegistry.registerAddress(gasPriceLimitId, gasPriceLimit.address);
+        await contractRegistry.setAddressProperty(gasPriceLimitId, gasPriceLimit.address);
 
         let formula = await BancorFormula.new();
         let formulaId = await contractIds.BANCOR_FORMULA.call();
-        await contractRegistry.registerAddress(formulaId, formula.address);
+        await contractRegistry.setAddressProperty(formulaId, formula.address);
 
         bancorNetwork = await BancorNetwork.new(contractRegistry.address);
         let bancorNetworkId = await contractIds.BANCOR_NETWORK.call();
-        await contractRegistry.registerAddress(bancorNetworkId, bancorNetwork.address);
+        await contractRegistry.setAddressProperty(bancorNetworkId, bancorNetwork.address);
         await bancorNetwork.setSignerAddress(accounts[3]);
 
         etherToken = await EtherToken.new();
