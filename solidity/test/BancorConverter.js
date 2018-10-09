@@ -13,8 +13,8 @@ const TestERC20Token = artifacts.require('TestERC20Token.sol');
 const utils = require('./helpers/Utils');
 
 const weight10Percent = 100000;
-const gasPrice = 22000000000;
-const gasPriceBadHigh = 22000000001;
+const gasPrice = 220000000000;
+const gasPriceBadHigh = 220000000001;
 
 let token;
 let tokenAddress;

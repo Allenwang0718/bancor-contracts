@@ -41,7 +41,7 @@ let smartToken4QuickBuyPath;
 let erc20QuickBuyPath;
 let smartToken1QuickSellPath;
 let smartToken2QuickSellPath;
-let defaultGasPriceLimit = 20000000000;
+let defaultGasPriceLimit = 200000000000;
 
 function prefixMessage(msgIn) {
     let msg = msgIn;

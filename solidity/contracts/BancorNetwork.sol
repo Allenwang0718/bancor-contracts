@@ -326,7 +326,7 @@ contract BancorNetwork is IBancorNetwork, TokenHolder, ContractIds, FeatureIds {
                 ensureAllowance(_fromToken, converter, _amount);
 
             // make the conversion - if it's the last one, also provide the minimum return value
-            _amount = converter.change(_fromToken, toToken, _amount, i == pathLength - 2 ? _minReturn : 1);
+            _amount = converter.convertInternal(_fromToken, toToken, _amount, i == pathLength - 2 ? _minReturn : 1);
             _fromToken = toToken;
         }
         return (toToken, _amount);

@@ -12,4 +12,5 @@ contract IBancorConverter {
     function conversionFee() public view returns (uint32) {}
     function connectors(address _address) public view returns (uint256, uint32, bool, bool, bool) {}
     function getConnectorBalance(IERC20Token _connectorToken) public view returns (uint256);
+    function convertInternal(IERC20Token _fromToken, IERC20Token _toToken, uint256 _amount, uint256 _minReturn) public returns (uint256);
 }
