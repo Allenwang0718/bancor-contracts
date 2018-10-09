@@ -200,7 +200,7 @@ contract BancorConverter is IBancorConverter, SmartTokenController, ContractIds,
     }
 
     /*
-        @dev allows the manager to update the quick buy path
+        @dev allows the owner to update the quick buy path
 
         @param _path    new quick buy path, see conversion path format in the bancorNetwork contract
     */
@@ -213,7 +213,7 @@ contract BancorConverter is IBancorConverter, SmartTokenController, ContractIds,
     }
 
     /*
-        @dev allows the manager to clear the quick buy path
+        @dev allows the owner to clear the quick buy path
     */
     function clearQuickBuyPath() public ownerOnly {
         quickBuyPath.length = 0;
@@ -231,7 +231,7 @@ contract BancorConverter is IBancorConverter, SmartTokenController, ContractIds,
     /**
         @dev disables the entire conversion functionality
         this is a safety mechanism in case of a emergency
-        can only be called by the manager
+        can only be called by the owner
 
         @param _disable true to disable conversions, false to re-enable them
     */
@@ -241,7 +241,7 @@ contract BancorConverter is IBancorConverter, SmartTokenController, ContractIds,
 
     /**
         @dev updates the current conversion fee
-        can only be called by the manager
+        can only be called by the owner
 
         @param _conversionFee new conversion fee, represented in ppm
     */

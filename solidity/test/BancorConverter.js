@@ -42,8 +42,7 @@ async function initConverter(accounts, activate, maxConversionFee = 0) {
         contractRegistry.address,
         maxConversionFee,
         connectorTokenAddress,
-        250000,
-        {gas: 5000000}
+        250000
     );
     let converterAddress = converter.address;
     await converter.addConnector(connectorTokenAddress2, 150000, false);
@@ -386,8 +385,8 @@ contract('BancorConverter', accounts => {
     it('should throw when attempting to add a connector when the converter is active', async () => {
         let token = await SmartToken.new('Token1', 'TKN1', 2);
         let converter = await BancorConverter.new(token.address, contractRegistry.address, 0, '0x0', 0, {gas: 5000000});
-        token.transferOwnership(converter.address);
-        converter.acceptTokenOwnership();
+        await token.transferOwnership(converter.address);
+        await converter.acceptTokenOwnership();
 
         try {
             await converter.addConnector(connectorTokenAddress, weight10Percent, false);
