@@ -4,7 +4,6 @@ import './interfaces/IBancorFormula.sol';
 import '../IBancorNetwork.sol';
 import '../ContractIds.sol';
 import '../FeatureIds.sol';
-import '../utility/Managed.sol';
 import '../utility/Utils.sol';
 import "@evolutionland/common/contracts/interfaces/ISettingsRegistry.sol";
 import '../utility/interfaces/IContractFeatures.sol';
@@ -33,7 +32,7 @@ import '../token/interfaces/IEtherToken.sol';
       Other potential solutions might include a commit/reveal based schemes
     - Possibly add getters for the connector fields so that the client won't need to rely on the order in the struct
 */
-contract BancorConverter is IBancorConverter, SmartTokenController, Managed, ContractIds, FeatureIds {
+contract BancorConverter is IBancorConverter, SmartTokenController, ContractIds, FeatureIds {
     uint32 private constant MAX_WEIGHT = 1000000;
     uint64 private constant MAX_CONVERSION_FEE = 1000000;
 
@@ -236,7 +235,7 @@ contract BancorConverter is IBancorConverter, SmartTokenController, Managed, Con
 
         @param _disable true to disable conversions, false to re-enable them
     */
-    function disableConversions(bool _disable) public ownerOrManagerOnly {
+    function disableConversions(bool _disable) public ownerOnly {
         conversionsEnabled = !_disable;
     }
 
@@ -248,7 +247,7 @@ contract BancorConverter is IBancorConverter, SmartTokenController, Managed, Con
     */
     function setConversionFee(uint32 _conversionFee)
         public
-        ownerOrManagerOnly
+        ownerOnly
         validConversionFee(_conversionFee)
     {
         emit ConversionFeeUpdate(conversionFee, _conversionFee);
@@ -723,11 +722,6 @@ contract BancorConverter is IBancorConverter, SmartTokenController, Managed, Con
 
         // execute the conversion and pass on the ETH with the call
         return bancorNetwork.convertForPrioritized2.value(msg.value)(_path, _amount, _minReturn, msg.sender, _block, _v, _r, _s);
-    }
-
-    // deprecated, backward compatibility
-    function change(IERC20Token _fromToken, IERC20Token _toToken, uint256 _amount, uint256 _minReturn) public returns (uint256) {
-        return convertInternal(_fromToken, _toToken, _amount, _minReturn);
     }
 
     /**

@@ -15,7 +15,7 @@ const DeployAndTest = artifacts.require('DeployAndTest');
 COIN = 10**18;
 
 const CONF = {
-     gasPrice: 30000000000000,
+    gasPrice: 30000000000000,
     weight10Percent: 100000,
     // remember to change this.
     from: '0x4cc4c344eba849dc09ac9af4bff1977e44fc1d7e'
@@ -26,25 +26,18 @@ module.exports = function(deployer) {
 
     // below will cause error when deploying contracts onto kovan
     // but ok on private chain like ganache
-
-    // deployer.deploy([
-    //     ContractRegistry,
-    //     ContractIds,
-    //     ContractFeatures,
-    //     BancorFormula,
-    //     FeatureIds,
-    //     WhiteList,
-    //     EtherToken,
-    // ]).then(...)
-    deployer.deploy(DeployAndTest);
-    deployer.deploy(SettingsRegistry);
-    deployer.deploy(ContractIds);
-    deployer.deploy(ContractFeatures);
-    deployer.deploy(BancorFormula);
-    deployer.deploy(WhiteList);
-    deployer.deploy(BancorGasPriceLimit, CONF.gasPrice);
-    deployer.deploy(EtherToken);
-    deployer.deploy(RING, 'RING').then( async() => {
+    
+    deployer.deploy([
+        DeployAndTest,
+        SettingsRegistry,
+        ContractIds,
+        ContractFeatures,
+        BancorFormula,
+        WhiteList,
+        EtherToken,
+        [BancorGasPriceLimit, CONF.gasPrice],
+        [RING, 'RING']
+    ]).then( async() => {
         await deployer.deploy(BancorNetwork, SettingsRegistry.address);
 
         let contractIds = await ContractIds.deployed();
@@ -52,10 +45,11 @@ module.exports = function(deployer) {
         let settingsRegistry = await SettingsRegistry.deployed();
         let contractFeaturesId = await contractIds.CONTRACT_FEATURES.call();
         await settingsRegistry.setAddressProperty(contractFeaturesId, contractFeatures.address);
+        console.log("LOGGING: address of settingsRegistry: ", settingsRegistry.address);
 
-        await deployer.deploy(BancorConverter, RING.address, settingsRegistry.address, 0, EtherToken.address, CONF.weight10Percent, {gas: 8000000});
+        await deployer.deploy(BancorConverter, RING.address, settingsRegistry.address, 0, EtherToken.address, CONF.weight10Percent, {gas: 5000000});
         console.log("LOGGING: address of bancorConverter: ", BancorConverter.address);
-        await deployer.deploy(BancorExchange, RING.address, BancorNetwork.address, BancorConverter.address);
+        await deployer.deploy(BancorExchange, RING.address, BancorNetwork.address, BancorConverter.address, {gas: 2000000});
 
 
         let gasPriceLimitId;
