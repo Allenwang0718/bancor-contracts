@@ -12,7 +12,7 @@ contract('test getPurchaseRequire and getPurchaseReturn', async (accounts) => {
     let bancorConverter;
     let etherToken;
 
-    before('deploy contracts', async (accounts) => {
+    before('deploy contracts', async () => {
         let initial = await BancorInitial.initBancor(accounts);
         bancorConverter = initial.bancorConverter;
         etherToken = initial.etherToken;
@@ -23,7 +23,7 @@ contract('test getPurchaseRequire and getPurchaseReturn', async (accounts) => {
         for (let ethHad = 1; ethHad <= 100000 * COIN; ethHad += getRandomInt(COIN)) {
             let ringReturn = await bancorConverter.getPurchaseReturn(etherToken.address, ethHad);
             let ethRequire = await bancorConverter.getPurchaseRequire(etherToken.address, ringReturn);
-            let bias = ringReturn.valueOf() - ethRequire.valueOf();
+            let bias = ethHad - ethRequire.valueOf();
             count++;
 
             console.log(count, "st count: the bias is ", bias);
