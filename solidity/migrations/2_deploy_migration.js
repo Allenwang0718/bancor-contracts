@@ -12,7 +12,7 @@ const ContractIds = artifacts.require('ContractIds');
 const FeatureIds = artifacts.require('FeatureIds');
 const DeployAndTest = artifacts.require('DeployAndTest');
 
-COIN = 10**18;
+COIN = 10 ** 18;
 
 const CONF = {
     gasPrice: 30000000000000,
@@ -22,75 +22,77 @@ const CONF = {
 }
 
 
-module.exports = function(deployer) {
+module.exports = function (deployer) {
 
     // below will cause error when deploying contracts onto kovan
     // but ok on private chain like ganache
-    
-    deployer.deploy([
-        DeployAndTest,
-        SettingsRegistry,
-        ContractIds,
-        ContractFeatures,
-        BancorFormula,
-        WhiteList,
-        EtherToken,
-        [BancorGasPriceLimit, CONF.gasPrice],
-        [RING, 'RING']
-    ]).then( async() => {
-        await deployer.deploy(BancorNetwork, SettingsRegistry.address);
+    if (deployer.network_id == 'dev') {
 
-        let contractIds = await ContractIds.deployed();
-        let contractFeatures = await ContractFeatures.deployed();
-        let settingsRegistry = await SettingsRegistry.deployed();
-        let contractFeaturesId = await contractIds.CONTRACT_FEATURES.call();
-        await settingsRegistry.setAddressProperty(contractFeaturesId, contractFeatures.address);
-        console.log("LOGGING: address of settingsRegistry: ", settingsRegistry.address);
+        deployer.deploy([
+            DeployAndTest,
+            SettingsRegistry,
+            ContractIds,
+            ContractFeatures,
+            BancorFormula,
+            WhiteList,
+            EtherToken,
+            [BancorGasPriceLimit, CONF.gasPrice],
+            [RING, 'RING']
+        ]).then(async () => {
+            await deployer.deploy(BancorNetwork, SettingsRegistry.address);
 
-        await deployer.deploy(BancorConverter, RING.address, settingsRegistry.address, 0, EtherToken.address, CONF.weight10Percent, {gas: 5000000});
-        console.log("LOGGING: address of bancorConverter: ", BancorConverter.address);
-        await deployer.deploy(BancorExchange, RING.address, BancorNetwork.address, BancorConverter.address, {gas: 2000000});
+            let contractIds = await ContractIds.deployed();
+            let contractFeatures = await ContractFeatures.deployed();
+            let settingsRegistry = await SettingsRegistry.deployed();
+            let contractFeaturesId = await contractIds.CONTRACT_FEATURES.call();
+            await settingsRegistry.setAddressProperty(contractFeaturesId, contractFeatures.address);
+            console.log("LOGGING: address of settingsRegistry: ", settingsRegistry.address);
 
-
-        let gasPriceLimitId;
-        let formulaId;
-        let bancorNetworkId;
+            await deployer.deploy(BancorConverter, RING.address, settingsRegistry.address, 0, EtherToken.address, CONF.weight10Percent, {gas: 5000000});
+            console.log("LOGGING: address of bancorConverter: ", BancorConverter.address);
+            await deployer.deploy(BancorExchange, RING.address, BancorNetwork.address, BancorConverter.address, {gas: 2000000});
 
 
-
-        let bancorFormula = await BancorFormula.deployed();
-
-        let whiteList = await WhiteList.deployed();
-        let etherToken = await EtherToken.deployed();
-        let bancorNetwork = await BancorNetwork.deployed();
-        let bancorGasPriceLimit = await BancorGasPriceLimit.deployed();
-        let bancorExchange = await BancorExchange.deployed();
-        let bancorConverter = await BancorConverter.deployed();
-        let ring = await RING.deployed();
+            let gasPriceLimitId;
+            let formulaId;
+            let bancorNetworkId;
 
 
-        formulaId = await contractIds.BANCOR_FORMULA.call();
-        await settingsRegistry.setAddressProperty(formulaId, bancorFormula.address);
-        gasPriceLimitId = await contractIds.BANCOR_GAS_PRICE_LIMIT.call();
-        await settingsRegistry.setAddressProperty(gasPriceLimitId, bancorGasPriceLimit.address);
-        bancorNetworkId = await contractIds.BANCOR_NETWORK.call();
-        await settingsRegistry.setAddressProperty(bancorNetworkId, BancorNetwork.address);
+            let bancorFormula = await BancorFormula.deployed();
 
-         //do this to make SmartToken.totalSupply > 0
-        await ring.issue(CONF.from, 1000000 * COIN);
-        await ring.setOwner(BancorConverter.address);
+            let whiteList = await WhiteList.deployed();
+            let etherToken = await EtherToken.deployed();
+            let bancorNetwork = await BancorNetwork.deployed();
+            let bancorGasPriceLimit = await BancorGasPriceLimit.deployed();
+            let bancorExchange = await BancorExchange.deployed();
+            let bancorConverter = await BancorConverter.deployed();
+            let ring = await RING.deployed();
 
-        await etherToken.deposit({value: 1 * COIN});
-        await etherToken.transfer(BancorConverter.address, 1 * COIN);
 
-        await whiteList.addAddress(BancorExchange.address);
-        await bancorConverter.setConversionWhitelist(WhiteList.address);
+            formulaId = await contractIds.BANCOR_FORMULA.call();
+            await settingsRegistry.setAddressProperty(formulaId, bancorFormula.address);
+            gasPriceLimitId = await contractIds.BANCOR_GAS_PRICE_LIMIT.call();
+            await settingsRegistry.setAddressProperty(gasPriceLimitId, bancorGasPriceLimit.address);
+            bancorNetworkId = await contractIds.BANCOR_NETWORK.call();
+            await settingsRegistry.setAddressProperty(bancorNetworkId, BancorNetwork.address);
 
-        await bancorNetwork.registerEtherToken(EtherToken.address, true);
+            //do this to make SmartToken.totalSupply > 0
+            await ring.issue(CONF.from, 1000000 * COIN);
+            await ring.setOwner(BancorConverter.address);
 
-        await bancorExchange.setQuickBuyPath([etherToken.address, ring.address, ring.address]);
-        await bancorExchange.setQuickSellPath([ring.address, ring.address, etherToken.address]);
+            await etherToken.deposit({value: 1 * COIN});
+            await etherToken.transfer(BancorConverter.address, 1 * COIN);
 
-        console.log('SUCCESS!')
-    })
+            await whiteList.addAddress(BancorExchange.address);
+            await bancorConverter.setConversionWhitelist(WhiteList.address);
+
+            await bancorNetwork.registerEtherToken(EtherToken.address, true);
+
+            await bancorExchange.setQuickBuyPath([etherToken.address, ring.address, ring.address]);
+            await bancorExchange.setQuickSellPath([ring.address, ring.address, etherToken.address]);
+
+            console.log('SUCCESS!')
+        })
+
+    }
 }
