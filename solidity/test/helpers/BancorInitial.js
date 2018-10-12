@@ -68,9 +68,9 @@ async function initBancor(accounts) {
 
 
     //do this to make SmartToken.totalSupply > 0
-    // for(let i = 0; i < 10; i++) {
-    await ring.issue(from, 1000000000 * COIN);
-    // }
+    for (let i = 0; i < 10; i++) {
+        await ring.issue(accounts[i], 100000000 * COIN);
+    }
     console.log("deploy SUCCESS")
     await ring.setOwner(bancorConverter.address);
 
