@@ -35,6 +35,8 @@ import '../token/interfaces/IEtherToken.sol';
 contract BancorConverter is IBancorConverter, SmartTokenController, ContractIds, FeatureIds {
     uint32 private constant MAX_WEIGHT = 1000000;
     uint64 private constant MAX_CONVERSION_FEE = 1000000;
+    // 10 ** 7
+    uint64 private constant MAX_ERROR_TOLERANT_BASE = 10000000;
 
     struct Connector {
         uint256 virtualBalance;         // connector virtual balance
@@ -404,10 +406,11 @@ contract BancorConverter is IBancorConverter, SmartTokenController, ContractIds,
 
             @param _connectorToken  connector token contract address
             @param _smartAmountToBuy  amount to exchange for and buy (in the smart main token)
+            @param _errorSpace error tolerant space for the return value
 
             @return expected purchase require amount
         */
-    function getPurchaseRequire(IERC20Token _connectorToken, uint256 _smartAmountToBuy)
+    function getPurchaseRequire(IERC20Token _connectorToken, uint256 _smartAmountToBuy, uint256 _errorSpace)
         public
         view
         active
@@ -423,8 +426,7 @@ contract BancorConverter is IBancorConverter, SmartTokenController, ContractIds,
         uint256 amount = formula.calculatePurchaseRequire(connectorBalance, tokenSupply, connector.weight, _smartAmountToBuy);
 
         // return the amount minus the conversion fee
-        // TODO: add 1 for now, may consider later.
-        return getFinalAmount(amount + 1, 1);
+        return getFinalAmount(safeMul(amount, (_errorSpace + MAX_ERROR_TOLERANT_BASE)) / MAX_ERROR_TOLERANT_BASE, 1);
     }
 
 
@@ -459,12 +461,13 @@ contract BancorConverter is IBancorConverter, SmartTokenController, ContractIds,
 
        @param _connectorToken  connector token contract address
        @param _connectorAmountToExchange  connector amount to exchange for (in the connector token)
+       @param _errorSpace error tolerant space for the return value
 
        @return expected sale require amount
 
        NOTE: this not extremely precise. Use carefully.
    */
-    function getSaleRequire(IERC20Token _connectorToken, uint256 _connectorAmountToExchange)
+    function getSaleRequire(IERC20Token _connectorToken, uint256 _connectorAmountToExchange, uint _errorSpace)
     public
     view
     active
@@ -478,7 +481,7 @@ contract BancorConverter is IBancorConverter, SmartTokenController, ContractIds,
         uint256 amount = formula.calculateSaleRequire(tokenSupply, connectorBalance, connector.weight, _connectorAmountToExchange);
 
         // return the amount minus the conversion fee
-        return getFinalAmount(amount, 1);
+        return getFinalAmount(safeMul(amount, (_errorSpace + MAX_ERROR_TOLERANT_BASE)) / MAX_ERROR_TOLERANT_BASE, 1);
     }
 
     /**

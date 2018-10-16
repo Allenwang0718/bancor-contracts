@@ -64,10 +64,11 @@ contract BancorExchange is Owned {
     }
 
     // this is used to buy specific amount of ring with minimum required eth
-    function buyRINGInMinRequiedETH(uint _minReturn, address _buyer) payable public returns (uint, uint) {
+    // @param _errorSpace belongs to [0, 10000000]
+    function buyRINGInMinRequiedETH(uint _minReturn, address _buyer, uint _errorSpace) payable public returns (uint, uint) {
         require(msg.sender == clockAuction);
 
-        (uint amountRequired) = bancorConverter.getPurchaseRequire(quickBuyPath[0], _minReturn);
+        (uint amountRequired) = bancorConverter.getPurchaseRequire(quickBuyPath[0], _minReturn, _errorSpace);
 
         require(msg.value >= amountRequired);
         uint amount = bancorConverter.quickConvert.value(amountRequired)(quickBuyPath, msg.value, _minReturn);
