@@ -5,5 +5,5 @@ const BancorFormula = artifacts.require('BancorFormula.sol');
 
 module.exports = (deployer) => {
     deployer.deploy(Migrations);
-    deployer.deploy(BancorFormula);
+    // deployer.deploy(BancorFormula);
 };

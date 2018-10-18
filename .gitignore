@@ -8,3 +8,4 @@ solidity/build
 **/truffle-config.js
 **/truffle.js
 solidity/package.json
+**/contracts-flattener
