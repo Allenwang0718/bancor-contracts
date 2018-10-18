@@ -426,7 +426,7 @@ contract BancorConverter is IBancorConverter, SmartTokenController, ContractIds,
         uint256 amount = formula.calculatePurchaseRequire(connectorBalance, tokenSupply, connector.weight, _smartAmountToBuy);
 
         // return the amount minus the conversion fee
-        return getFinalAmount(safeMul(amount, (_errorSpace + MAX_ERROR_TOLERANT_BASE)) / MAX_ERROR_TOLERANT_BASE, 1);
+        return getFinalAmount(safeMul((amount + 1), (_errorSpace + MAX_ERROR_TOLERANT_BASE)) / MAX_ERROR_TOLERANT_BASE, 1);
     }
 
 
