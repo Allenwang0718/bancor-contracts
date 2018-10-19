@@ -22,7 +22,6 @@ const CONF = {
     // remember to change this.
     from: '0x4cc4c344eba849dc09ac9af4bff1977e44fc1d7e',
     registry_address: '0xf21930682df28044d88623e0707facf419477041',
-    ring_address: '0xee716e90ac3b65ad0a9641756db4b3c067caee64'
 }
 
 
@@ -93,9 +92,9 @@ module.exports = function (deployer, network) {
             //do this to make SmartToken.totalSupply > 0
             await ring.changeCap(20 * 10**8 * COIN);
             await ring.issue(CONF.from, 12 * 10 **8 * COIN);
-            await smartTokenAuthority.setWhitelist(bancorConverter.address, true);
-            // await ring.transferOwnership(bancorConverter.address);
-            // await bancorConverter.acceptTokenOwnership();
+            // await smartTokenAuthority.setWhitelist(bancorConverter.address, true);
+            await ring.transferOwnership(bancorConverter.address);
+            await bancorConverter.acceptTokenOwnership();
 
             // await etherToken.deposit({value: 1 * COIN});
             // await etherToken.transfer(BancorConverter.address, 1 * COIN);
