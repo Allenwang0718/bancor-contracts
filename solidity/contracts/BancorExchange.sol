@@ -106,7 +106,6 @@ contract BancorExchange is Owned, AuctionSettingIds {
     // @param _minReturn minimum amount of ETH you expect
     function sellRING(uint _sellAmount, uint _minReturn) public {
         ISmartToken smartToken = ISmartToken(registry.addressOf(SettingIds.CONTRACT_RING_ERC20_TOKEN));
-        smartToken.transfer(msg.sender, amount);
 
         smartToken.transferFrom(msg.sender, address(bancorNetwork), _sellAmount);
         // cant replace address(this) with msg.sender
