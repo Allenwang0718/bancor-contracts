@@ -89,7 +89,6 @@ contract BancorExchange is Owned, AuctionSettingIds {
 
     function tokenFallback(address _from, uint256 _value, bytes _data) public {
         ISmartToken smartToken = ISmartToken(registry.addressOf(SettingIds.CONTRACT_RING_ERC20_TOKEN));
-        smartToken.transfer(msg.sender, amount);
 
         if (address(smartToken) == msg.sender) {
             uint minReturn = bytesToUint256(_data);
