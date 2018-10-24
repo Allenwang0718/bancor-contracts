@@ -74,7 +74,6 @@ contract BancorExchange is Owned, AuctionSettingIds {
         require(msg.sender == clockAuction);
 
         ISmartToken smartToken = ISmartToken(registry.addressOf(SettingIds.CONTRACT_RING_ERC20_TOKEN));
-        smartToken.transfer(msg.sender, amount);
 
         (uint amountRequired) = bancorConverter.getPurchaseRequire(quickBuyPath[0], _minReturn, _errorSpace);
 
