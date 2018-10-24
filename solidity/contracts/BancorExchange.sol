@@ -1,14 +1,20 @@
 pragma solidity ^0.4.23;
 
-import "./converter/BancorConverter.sol";
+import "./converter/interfaces/IBancorConverter.sol";
+import "@evolutionland/common/contracts/interfaces/ISettingsRegistry.sol";
+import "@evolutionland/market/contracts/auction/AuctionSettingIds.sol";
+import "./utility/Owned.sol";
+import "./token/interfaces/ISmartToken.sol";
+import "./IBancorNetwork.sol";
 
 
-contract BancorExchange is Owned {
+contract BancorExchange is Owned, AuctionSettingIds {
+
+    ISettingsRegistry registry;
 
     ISmartToken public smartToken;
     IBancorNetwork public bancorNetwork;
-    BancorConverter public bancorConverter;
-    address clockAuction;
+    IBancorConverter public bancorConverter;
 
     IERC20Token[] public quickSellPath;
     IERC20Token[] public quickBuyPath;
@@ -19,18 +25,14 @@ contract BancorExchange is Owned {
         _;
     }
 
-    constructor(address _st, address _bn, address _bc) public {
-        smartToken = ISmartToken(_st);
+    constructor(address _st, address _bn, address _bc, address _registry) public {
         bancorNetwork = IBancorNetwork(_bn);
-        bancorConverter = BancorConverter(_bc);
+        bancorConverter = IBancorConverter(_bc);
+        registry = ISettingsRegistry(_registry);
     }
 
     function() public payable {
         // this is necessary!
-    }
-
-    function setSmartToken(address _st) public ownerOnly {
-        smartToken = ISmartToken(_st);
     }
 
     function setBancorNetwork(address _bn) public ownerOnly {
@@ -38,7 +40,7 @@ contract BancorExchange is Owned {
     }
 
     function setBancorConverter(address _bc) public ownerOnly {
-        bancorConverter = BancorConverter(_bc);
+        bancorConverter = IBancorConverter(_bc);
     }
 
     function setQuickSellPath(IERC20Token[] _path)
@@ -59,6 +61,7 @@ contract BancorExchange is Owned {
 
     function buyRING(uint _minReturn) payable public returns (uint) {
         uint amount = bancorConverter.quickConvert.value(msg.value)(quickBuyPath, msg.value, _minReturn);
+        ISmartToken smartToken = ISmartToken(registry.addressOf(SettingIds.CONTRACT_RING_ERC20_TOKEN));
         smartToken.transfer(msg.sender, amount);
         return amount;
     }
@@ -66,20 +69,29 @@ contract BancorExchange is Owned {
     // this is used to buy specific amount of ring with minimum required eth
     // @param _errorSpace belongs to [0, 10000000]
     function buyRINGInMinRequiedETH(uint _minReturn, address _buyer, uint _errorSpace) payable public returns (uint, uint) {
+
+        address clockAuction = registry.addressOf(AuctionSettingIds.CONTRACT_CLOCK_AUCTION);
         require(msg.sender == clockAuction);
+
+        ISmartToken smartToken = ISmartToken(registry.addressOf(SettingIds.CONTRACT_RING_ERC20_TOKEN));
+        smartToken.transfer(msg.sender, amount);
 
         (uint amountRequired) = bancorConverter.getPurchaseRequire(quickBuyPath[0], _minReturn, _errorSpace);
 
         require(msg.value >= amountRequired);
-        uint amount = bancorConverter.quickConvert.value(amountRequired)(quickBuyPath, msg.value, _minReturn);
+        uint amount = bancorConverter.quickConvert.value(amountRequired)(quickBuyPath, amountRequired, _minReturn);
         uint refundEth = msg.value - amountRequired;
         if (refundEth > 0) {
             _buyer.transfer(refundEth);
         }
+        smartToken.transfer(msg.sender, amount);
         return (amount, amountRequired);
     }
 
     function tokenFallback(address _from, uint256 _value, bytes _data) public {
+        ISmartToken smartToken = ISmartToken(registry.addressOf(SettingIds.CONTRACT_RING_ERC20_TOKEN));
+        smartToken.transfer(msg.sender, amount);
+
         if (address(smartToken) == msg.sender) {
             uint minReturn = bytesToUint256(_data);
             smartToken.transfer(address(bancorNetwork), _value);
@@ -94,6 +106,9 @@ contract BancorExchange is Owned {
     // @param _sellAmount amount of ring you want to sell
     // @param _minReturn minimum amount of ETH you expect
     function sellRING(uint _sellAmount, uint _minReturn) public {
+        ISmartToken smartToken = ISmartToken(registry.addressOf(SettingIds.CONTRACT_RING_ERC20_TOKEN));
+        smartToken.transfer(msg.sender, amount);
+
         smartToken.transferFrom(msg.sender, address(bancorNetwork), _sellAmount);
         // cant replace address(this) with msg.sender
         // because of whitelist mechanism in bancor protocol
@@ -122,8 +137,8 @@ contract BancorExchange is Owned {
         token.transfer(owner, balance);
     }
 
-    function setClockAuction(address _clockAuction) public ownerOnly {
-        clockAuction = _clockAuction;
+    function setRegistry(address _registry) public ownerOnly {
+        registry = ISettingsRegistry(_registry);
     }
 
 
