@@ -33,6 +33,7 @@ contract BancorExchange is PausableDSAuth, SettingIds {
 
     function() public payable {
         // this is necessary!
+        buyRING(1);
     }
 
     function setBancorNetwork(address _bn) public onlyOwner {
