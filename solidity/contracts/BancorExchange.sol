@@ -59,7 +59,7 @@ contract BancorExchange is PausableDSAuth, SettingIds {
         quickBuyPath = _path;
     }
 
-    function buyRING(uint _minReturn) public payable  returns (uint) {
+    function buyRING(uint _minReturn) public payable whenNotPaused returns (uint) {
         uint amount = bancorConverter.quickConvert.value(msg.value)(quickBuyPath, msg.value, _minReturn);
         ISmartToken smartToken = ISmartToken(registry.addressOf(SettingIds.CONTRACT_RING_ERC20_TOKEN));
         smartToken.transfer(msg.sender, amount);
@@ -68,7 +68,7 @@ contract BancorExchange is PausableDSAuth, SettingIds {
 
     // this is used to buy specific amount of ring with minimum required eth
     // @param _errorSpace belongs to [0, 10000000]
-    function buyRINGInMinRequiedETH(uint _minReturn, address _buyer, uint _errorSpace) public payable auth  returns (uint, uint) {
+    function buyRINGInMinRequiedETH(uint _minReturn, address _buyer, uint _errorSpace) public payable auth whenNotPaused returns (uint, uint) {
         ISmartToken smartToken = ISmartToken(registry.addressOf(SettingIds.CONTRACT_RING_ERC20_TOKEN));
 
         (uint amountRequired) = bancorConverter.getPurchaseRequire(quickBuyPath[0], _minReturn, _errorSpace);
@@ -83,7 +83,7 @@ contract BancorExchange is PausableDSAuth, SettingIds {
         return (amount, amountRequired);
     }
 
-    function tokenFallback(address _from, uint256 _value, bytes _data) public {
+    function tokenFallback(address _from, uint256 _value, bytes _data) public whenNotPaused  {
         ISmartToken smartToken = ISmartToken(registry.addressOf(SettingIds.CONTRACT_RING_ERC20_TOKEN));
 
         if (address(smartToken) == msg.sender) {
@@ -99,7 +99,7 @@ contract BancorExchange is PausableDSAuth, SettingIds {
     // @dev before invoke sellRING, make sure approve to exchange before in RING contract
     // @param _sellAmount amount of ring you want to sell
     // @param _minReturn minimum amount of ETH you expect
-    function sellRING(uint _sellAmount, uint _minReturn) public {
+    function sellRING(uint _sellAmount, uint _minReturn) public whenNotPaused {
         ISmartToken smartToken = ISmartToken(registry.addressOf(SettingIds.CONTRACT_RING_ERC20_TOKEN));
 
         smartToken.transferFrom(msg.sender, address(bancorNetwork), _sellAmount);
@@ -120,7 +120,7 @@ contract BancorExchange is PausableDSAuth, SettingIds {
     }
 
 
-    function claimTokens(address _token) public auth {
+    function claimTokens(address _token) public onlyOwner {
         if (_token == 0x0) {
             owner.transfer(address(this).balance);
             return;
