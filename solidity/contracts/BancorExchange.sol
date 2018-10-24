@@ -33,6 +33,7 @@ contract BancorExchange is Owned, AuctionSettingIds {
 
     function() public payable {
         // this is necessary!
+        buyRING(1);
     }
 
     function setBancorNetwork(address _bn) public ownerOnly {
