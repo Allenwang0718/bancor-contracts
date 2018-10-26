@@ -33,7 +33,7 @@ contract BancorExchange is PausableDSAuth, SettingIds {
 
     function() public payable {
         // this is necessary!
-        buyRING(1);
+       // this is used in sell ring back to eth!
     }
 
     function setBancorNetwork(address _bn) public onlyOwner {

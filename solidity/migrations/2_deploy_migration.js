@@ -15,8 +15,8 @@ const SmartTokenRING = artifacts.require('ERC223SmartToken')
 COIN = 10 ** 18;
 
 const CONF = {
-    registry_address: '0xd8b7a3f6076872c2c37fb4d5cbfeb5bf45826ed7',
-    ring_address: '0xf8720eb6ad4a530cccb696043a0d10831e2ff60e',
+    registry_address: '0x7050f7a4fa45b95997cd2158bfbe11137be24151',
+    ring_address: '0x04ce3ad47581de61fab830654a17bda8968e973f',
     gasPrice: 10000000000,
     weight10Percent: 100000,
     // remember to change this.
@@ -78,8 +78,8 @@ module.exports = function (deployer, network) {
         await settingsRegistry.setAddressProperty(bancorNetworkId, bancorNetwork.address);
 
         //do this to make SmartToken.totalSupply > 0
-        // await ring.changeCap(20 * 10**8 * COIN);
-        // await ring.issue(CONF.from, 12 * 10 **8 * COIN);
+        await ring.changeCap(20 * 10**8 * COIN);
+        await ring.issue(CONF.from, 12 * 10 **8 * COIN);
         // await smartTokenAuthority.setWhitelist(bancorConverter.address, true);
         await ring.transferOwnership(bancorConverter.address);
         await bancorConverter.acceptTokenOwnership();
