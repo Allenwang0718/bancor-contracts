@@ -1,8 +1,6 @@
 pragma solidity ^0.4.24;
 
-import "@evolutionland/common/contracts/interfaces/IAuthority.sol";
-
-contract BancorExchangeAuthority is IAuthority {
+contract BancorExchangeAuthority {
 
     mapping (address => bool) public whiteList;
 
