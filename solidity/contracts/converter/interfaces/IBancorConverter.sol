@@ -15,4 +15,5 @@ contract IBancorConverter {
     function convertInternal(IERC20Token _fromToken, IERC20Token _toToken, uint256 _amount, uint256 _minReturn) public returns (uint256);
     function getPurchaseRequire(IERC20Token _connectorToken, uint256 _smartAmountToBuy, uint256 _errorSpace) public view returns (uint256);
     function quickConvert(IERC20Token[] _path, uint256 _amount, uint256 _minReturn) public payable returns (uint256);
+    function getFinalAmount(uint256 _amount, uint8 _magnitude) public view returns (uint256);
 }
